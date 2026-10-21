@@ -64,8 +64,20 @@ test("authenticated idempotent anchor is mined and queryable on chain", async ()
   assert.match(firstBody.transaction_hash, /^0x[0-9a-f]{64}$/i);
   const second = await request();
   assert.deepEqual(await second.json(), firstBody);
+  await provider.waitForTransaction(firstBody.transaction_hash, 1);
   assert.ok((await contract.roots(root)) > 0n);
   const receipt = await provider.getTransactionReceipt(firstBody.transaction_hash);
   assert.equal(receipt.status, 1);
   assert.equal(receipt.to.toLowerCase(), awaitAddress.toLowerCase());
+  const changed = await fetch(url, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json", "idempotency-key": anchorId }, body: JSON.stringify({ anchor_id: anchorId, root: `0x${"43".repeat(32)}`, chain_id: chainId, contract_address: awaitAddress }) });
+  assert.equal(changed.status, 409);
+  assert.equal(await contract.roots(`0x${"43".repeat(32)}`), 0n);
+});
+
+test("malformed authenticated requests do not crash the relayer", async () => {
+  for (const input of [null, {}, { anchor_id: "test-invalid-001", root: `0x${"44".repeat(32)}`, chain_id: chainId, contract_address: 123 }]) {
+    const res = await fetch(`http://127.0.0.1:${relayerPort}/anchors`, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json", "idempotency-key": "test-invalid-001" }, body: JSON.stringify(input) });
+    assert.equal(res.status, 400);
+  }
+  assert.equal((await fetch(`http://127.0.0.1:${relayerPort}/health`)).status, 200);
 });
