@@ -19,7 +19,13 @@ docker compose exec redis redis-cli ping
 
 ## Backups
 
-Run `sh scripts/backup.sh` from a trusted host with Docker Compose and a POSIX shell. The script creates a PostgreSQL custom-format archive under ignored `work/backups/`, checks that `pg_restore` can read its archive index, and keeps it local. Copy backups to a separate protected storage location and rehearse restores into a fresh database. Keep encryption keys and `.env` out of the repository and backups that are accessible to untrusted users.
+Run `sh scripts/backup.sh` from a trusted host with Docker Compose and a POSIX shell. The script uses private file permissions, writes a temporary PostgreSQL custom-format archive under ignored `work/backups/`, validates its archive index, then publishes the complete file and a SHA-256 checksum. `BACKUP_DIR` can select another protected backup directory. Incomplete dumps are removed on failure. These archives contain account/session data and must stay protected.
+
+Run `sh scripts/verify-backup.sh path/to/backup.dump` to perform a complete restore in an isolated temporary PostgreSQL 18 container. The official image must already exist locally. The test container has no network or production volumes; its database lives in a size-limited temporary filesystem. The script checks restore errors and prints migration status, core data counts, constraint status and all public-table counts; its exit trap removes the test container and data. Compare the results with the expected backup snapshot. This test uses a 256MB memory ceiling and 0.25 CPU.
+
+The `/home/rescueproof` deployment includes `deploy/rescueproof-backup.service` and `.timer`: daily at 19:00 UTC (03:00 Asia/Shanghai) with up to ten minutes of randomized delay. `Persistent=true` catches a missed run after startup. Install the units under `/etc/systemd/system`, reload systemd, enable the timer and perform an immediate service run. Inspect with `systemctl list-timers rescueproof-backup.timer` and `journalctl -u rescueproof-backup.service`. The unit assumes the root project path above and an installed Docker Compose plugin; adjust its working directory for another installation.
+
+Copy backups to separate protected storage. On 2026-10-21 a complete restore succeeded for all 16 public tables, including 21 batches and 58 event proofs, and a checksum-matching copy was saved to protected operator storage outside the server. Ongoing automatic transfer off the server and backup-retention policy are not configured. Keep encryption keys and `.env` out of the repository and backups accessible to untrusted users.
 
 ## First operator
 

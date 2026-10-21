@@ -99,6 +99,10 @@ chmod 600 "$backup"
 ```
 
 Archive-index validation checks readability, not a complete restore rehearsal.
+For a complete isolated rehearsal, run `sudo sh scripts/verify-backup.sh path/to/backup.dump`.
+It uses a temporary, network-isolated PostgreSQL 18 container and never attaches
+production data volumes. Daily systemd backups are installed for 03:00 Asia/Shanghai,
+with up to ten minutes of randomized delay; see [Operations](operations.md).
 Transfer backups to protected storage outside the server. Back up `.env`, the
 Relayer state and certificate storage separately with appropriate access control.
 Restore with `pg_restore --no-owner --no-acl --exit-on-error` into a **fresh**
@@ -127,3 +131,14 @@ no unprocessed outbox jobs. A protected 52KB database archive was created and it
 archive index checked. The in-app browser reported `ERR_CONNECTION_CLOSED`, so
 browser visual validation was not completed; strict certificate validation,
 HTTP/1.1, HTTP/2 and the public API checks succeeded from the operator machine.
+
+Database acceptance was then repeated: PostgreSQL 18.6 has migration 1 applied,
+`fsync` and `synchronous_commit` enabled, and the named `rescueproof_postgres_data`
+volume mounted at `/var/lib/postgresql`. A new automated backup was restored in
+full into an isolated temporary database: all 16 public tables were present,
+21 batches and 58 proofs survived, nine anchors remained confirmed, and no
+unvalidated constraints were found. The SHA-256-matching backup was also copied
+to protected operator storage outside the server. PostgreSQL itself was restarted;
+counts, public readiness, login and the same 14 confirmed proofs still passed.
+The daily timer is enabled and active. Automatic off-server replication and
+retention cleanup remain separate operational work.

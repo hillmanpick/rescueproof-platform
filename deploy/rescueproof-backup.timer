@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily RescueProof database backup
+
+[Timer]
+OnCalendar=*-*-* 19:00:00 UTC
+RandomizedDelaySec=10m
+Persistent=true
+Unit=rescueproof-backup.service
+
+[Install]
+WantedBy=timers.target
