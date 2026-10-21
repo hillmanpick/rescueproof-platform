@@ -158,6 +158,15 @@ function downloadProof() {
   a.click();
   URL.revokeObjectURL(u);
 }
+function transactionUrl(proof: Record<string, unknown>) {
+  const explorers: Record<number, string> = {
+    84532: "https://sepolia.basescan.org/tx/",
+    11155111: "https://sepolia.etherscan.io/tx/",
+  };
+  const base = explorers[Number(proof.chain_id)];
+  const hash = String(proof.transaction_hash || "");
+  return base && /^0x[\da-f]{64}$/i.test(hash) ? `${base}${hash}` : "";
+}
 </script>
 <template>
   <section class="container page-section">
@@ -261,6 +270,13 @@ function downloadProof() {
                       : t("detail.batchedProof")
                 }}</span
                 ><code>{{ String(p.root).slice(0, 20) }}…</code>
+                <a
+                  v-if="transactionUrl(p)"
+                  :href="transactionUrl(p)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-button proof-link"
+                >{{ t("detail.viewTransaction") }}</a>
               </div>
               <button class="text-button" @click="downloadProof">
                 {{ t("detail.download") }}

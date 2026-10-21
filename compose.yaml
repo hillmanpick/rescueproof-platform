@@ -63,6 +63,28 @@ services:
         condition: service_healthy
     networks: [edge, data]
     logging: *logs
+  relayer:
+    profiles: [anchor]
+    build:
+      context: ./relayer
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      RELAYER_TOKEN: ${ANCHOR_RELAYER_TOKEN:-}
+      RELAYER_PRIVATE_KEY: ${RELAYER_PRIVATE_KEY:-}
+      CHAIN_ID: ${ANCHOR_CHAIN_ID:-}
+      CONTRACT_ADDRESS: ${ANCHOR_CONTRACT_ADDRESS:-}
+      RPC_URL: ${ANCHOR_RPC_URL:-}
+      STATE_FILE: /data/relayer-state.json
+    volumes: [relayer_data:/data]
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks: [edge, data]
+    logging: *logs
   postgres:
     image: postgres:18-alpine
     restart: unless-stopped
@@ -94,6 +116,7 @@ volumes:
   postgres_data:
   caddy_data:
   caddy_config:
+  relayer_data:
 networks:
   edge:
   data:

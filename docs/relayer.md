@@ -20,7 +20,21 @@ Content-Type: application/json
 
 Success must return `{"transaction_hash":"0x<32-byte transaction hash>"}` and must be idempotent for the anchor ID. Returning a hash means only “submitted”, not “confirmed”. The Worker independently queries the configured RPC, requires a successful receipt addressed to the configured contract, checks that `roots(bytes32)` at that block contains the exact submitted root, and verifies the RPC chain ID. Only then does the API mark it confirmed.
 
-Use a dedicated signer with only the right to call `anchor`, keep it outside the application server and set transaction limits. Configure `ANCHOR_CHAIN_ID`, `ANCHOR_CONTRACT_ADDRESS`, `ANCHOR_RPC_URL`, `ANCHOR_RELAYER_URL` and `ANCHOR_RELAYER_TOKEN` together. Prefer Base Sepolia for a demo; do not write mainnet transactions until the user has configured and reviewed the target contract and relayer. When any values are missing, evidence remains pending.
+The repository includes the isolated Node.js Relayer in `relayer/`. It accepts only authenticated, bounded requests with matching idempotency IDs; checks the configured chain, deployed contract code and owner at startup; serializes writes to a contract; waits for a mined transaction; and stores idempotency results in a persistent file. Its signing key is not passed to the API container. In Compose, enable it with `docker compose --profile anchor up -d --build relayer`; the API reaches it at `http://relayer:8080` over the non-published Docker network. HTTP is allowed only for this fixed private service hostname. Keep the signer funded only with a small testnet balance.
+
+For the Base Sepolia demo, set `ANCHOR_CHAIN_ID=84532`, `ANCHOR_RPC_URL`, `ANCHOR_RELAYER_URL=http://relayer:8080`, a random `ANCHOR_RELAYER_TOKEN`, and a freshly deployed `ANCHOR_CONTRACT_ADDRESS`. Put the dedicated key in `RELAYER_PRIVATE_KEY`; do not use a personal wallet key or commit `.env`. Deploy from a secure local terminal after funding a dedicated wallet with Base Sepolia test ETH:
+
+```powershell
+cd relayer
+npm ci
+$env:ANCHOR_RPC_URL = 'https://your-base-sepolia-rpc'
+$env:RELAYER_PRIVATE_KEY = '0x<dedicated-testnet-key>'
+npm run deploy
+```
+
+Copy the reported contract address and the same RPC, chain ID, relayer URL, private key and shared token into the untracked root `.env`. Start the app with `docker compose --profile anchor up -d --build`; verify `docker compose ps` and worker logs. The public proof response includes the receipt status, contract, chain, block and transaction hash. The Detail page links confirmed Base Sepolia and Ethereum Sepolia transactions to their explorers. Do not use a mainnet key or mainnet RPC for this demo.
+
+Run the local-chain end-to-end test with `cd relayer; npm ci; npm test`. It compiles and deploys the Solidity contract on an ephemeral Ganache EVM, submits a signed transaction through the HTTP Relayer, repeats the same idempotency key, and independently checks the receipt and stored root over JSON-RPC. This proves the software path, not a public-network transaction.
 
 ## Merkle format
 

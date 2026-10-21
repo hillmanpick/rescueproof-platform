@@ -66,9 +66,12 @@ impl Config {
         ] {
             if let Some(value) = value {
                 let u = url::Url::parse(value)?;
-                let local = matches!(u.host_str(), Some("localhost" | "127.0.0.1" | "::1"));
+                let loopback = matches!(u.host_str(), Some("localhost" | "127.0.0.1" | "::1"));
+                let private_relayer =
+                    name == "ANCHOR_RELAYER_URL" && u.host_str() == Some("relayer");
                 anyhow::ensure!(
-                    (u.scheme() == "https" || local && u.scheme() == "http")
+                    (u.scheme() == "https"
+                        || u.scheme() == "http" && (loopback || private_relayer))
                         && u.username().is_empty()
                         && u.password().is_none(),
                     "{name} must use HTTPS and must not embed credentials"

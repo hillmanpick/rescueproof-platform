@@ -321,6 +321,12 @@ export const workflow = {
     "En attente de confirmation sur la chaîne",
     "チェーン上の確認待ち",
   ],
+  "detail.viewTransaction": [
+    "在区块浏览器查看交易",
+    "View transaction on explorer",
+    "Voir la transaction dans l’explorateur",
+    "ブロックエクスプローラーで取引を見る",
+  ],
   "detail.batchedProof": [
     "摘要已生成，待上链",
     "Digest ready; awaiting anchoring",

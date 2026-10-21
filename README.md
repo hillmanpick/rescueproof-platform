@@ -75,6 +75,8 @@ Promote the first operator through an authenticated server shell after registrat
 
 See [Operations](docs/operations.md), [API](docs/api.md), [Security](docs/security.md), and [Relayer](docs/relayer.md).
 
+For a Base Sepolia anchoring demo, deploy the `RescueProofAnchor` contract with a dedicated test wallet and configure the isolated Relayer using [Relayer setup](docs/relayer.md). The chain integration is optional; without the complete configuration, records remain pending and are never presented as on-chain verified. Run `cd relayer; npm ci; npm test` to exercise contract deployment, relayer authentication/idempotency, a mined local EVM transaction, and on-chain root lookup.
+
 ## Important limits
 
 - Organisation review and any food-safety decisions require accountable human operators.
