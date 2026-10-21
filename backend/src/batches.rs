@@ -474,8 +474,13 @@ pub async fn impact(State(s): State<AppState>) -> ApiResult<Json<Value>> {
         sqlx::query_scalar("SELECT count(*) FROM food_batches WHERE status='completed'")
             .fetch_one(&s.db)
             .await?;
+    let demo_data: bool = sqlx::query_scalar(
+        "SELECT EXISTS(SELECT 1 FROM food_batches WHERE title LIKE '【演示】%')",
+    )
+    .fetch_one(&s.db)
+    .await?;
     Ok(Json(
-        json!({"completed_batches":batches,"claims":r.0,"completed_claims":r.1,"completed_weight_kg":r.2,"disputes":r.3,"evidence":"self-reported by participating organisations; not independently audited"}),
+        json!({"completed_batches":batches,"claims":r.0,"completed_claims":r.1,"completed_weight_kg":r.2,"disputes":r.3,"demo_data":demo_data,"evidence":"self-reported by participating organisations; not independently audited"}),
     ))
 }
 

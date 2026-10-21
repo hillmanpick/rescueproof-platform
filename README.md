@@ -47,6 +47,8 @@ The admin account can approve donor and recipient organisations in the UI. Regis
 
 ## Checks
 
+For local UI and workflow testing, populate the development database using the [demo data command](docs/demo-data.md). It preserves existing users and supplies labelled food batches, timeline events, proofs and separate role accounts.
+
 ```powershell
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings

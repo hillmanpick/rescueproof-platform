@@ -23,6 +23,7 @@ const impact = ref({
   completed_batches: 0,
   completed_weight_kg: 0,
   completed_claims: 0,
+  demo_data: false,
 });
 const filtered = computed(() =>
   items.value.filter(
@@ -32,6 +33,9 @@ const filtered = computed(() =>
         .toLowerCase()
         .includes(search.value.toLowerCase()),
   ),
+);
+const hasDemoData = computed(
+  () => impact.value.demo_data || items.value.some((b) => /^\u3010\u6f14\u793a\u3011/.test(b.title)),
 );
 const categories = [
   ["", "all"],
@@ -128,7 +132,9 @@ onMounted(load);
         <strong>{{ number(impact.completed_claims) }}</strong
         ><span>{{ t("completedClaims") }}</span>
       </div>
-      <div class="impact-disclaimer">{{ t("impactNote") }}</div>
+      <div class="impact-disclaimer">
+        {{ hasDemoData ? t("impactDemoNote") : t("impactNote") }}
+      </div>
     </div>
   </section>
   <section id="discover" class="section container">

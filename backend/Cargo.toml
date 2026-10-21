@@ -2,6 +2,7 @@
 name = "rescueproof"
 version = "0.1.0"
 edition = "2024"
+default-run = "rescueproof"
 rust-version = "1.90"
 
 [dependencies]
