@@ -1,10 +1,133 @@
 <script setup lang="ts">
-import {computed,ref} from 'vue'
-import {useRoute,useRouter} from 'vue-router'
-import {Leaf,ArrowUpRight,ShieldCheck} from 'lucide-vue-next'
-import {post,refreshSession} from '../api'
-const route=useRoute(),router=useRouter(),register=computed(()=>route.path==='/register')
-const form=ref({name:'',email:'',password:'',organization_name:'',organization_kind:'donor'}),error=ref(''),busy=ref(false)
-async function submit(){if(busy.value)return;busy.value=true;error.value='';try{await post(register.value?'/auth/register':'/auth/login',register.value?form.value:{email:form.value.email,password:form.value.password});await refreshSession();await router.push('/workspace')}catch(e){error.value=(e as Error).message}finally{busy.value=false}}
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { Leaf, ArrowUpRight, ShieldCheck } from "lucide-vue-next";
+import { post, refreshSession, errorMessage } from "../api";
+import { t } from "../i18n";
+const route = useRoute(),
+  router = useRouter(),
+  register = computed(() => route.path === "/register");
+const form = ref({
+    name: "",
+    email: "",
+    password: "",
+    organization_name: "",
+    organization_kind: "donor",
+  }),
+  error = ref<unknown>(null),
+  busy = ref(false);
+async function submit() {
+  if (busy.value) return;
+  busy.value = true;
+  error.value = null;
+  try {
+    await post(
+      register.value ? "/auth/register" : "/auth/login",
+      register.value
+        ? form.value
+        : { email: form.value.email, password: form.value.password },
+    );
+    await refreshSession();
+    await router.push("/workspace");
+  } catch (e) {
+    error.value = e;
+  } finally {
+    busy.value = false;
+  }
+}
 </script>
-<template><section class="auth-shell container"><div class="auth-story"><span class="eyebrow">WELCOME TO THE COMMUNITY</span><h1>一份食物，<br>一座社区的<br><span>善意连接。</span></h1><p>每一个小小的分享，<br>都可以让好食物走得更远。</p><Leaf class="auth-leaf" :size="180" :stroke-width="0.7"/><div class="auth-security"><ShieldCheck :size="20"/>组织先审核，交接双确认。</div></div><div class="auth-panel"><h2>{{register?'加入 RescueProof':'很高兴，再见到你。'}}</h2><p>{{register?'从你的组织开始，让余量成为馈赠。':'登录你的社区食品分享工作台。'}}</p><form @submit.prevent="submit"><label v-if="register">你的姓名<input v-model="form.name" autocomplete="name" maxlength="100" required placeholder="怎么称呼你？"/></label><label>邮箱<input v-model="form.email" type="email" autocomplete="email" maxlength="254" required placeholder="you@organisation.org"/></label><label>密码<input v-model="form.password" type="password" :autocomplete="register?'new-password':'current-password'" :minlength="register?12:1" maxlength="128" required :placeholder="register?'至少 12 个字符':'输入你的密码'"/></label><template v-if="register"><label>组织名称<input v-model="form.organization_name" minlength="2" maxlength="160" required placeholder="商家或社区组织的名称"/></label><fieldset><legend>你希望如何参与？</legend><div class="role-options"><label :class="{active:form.organization_kind==='donor'}"><input v-model="form.organization_kind" type="radio" value="donor"/>分享食品的商家</label><label :class="{active:form.organization_kind==='recipient'}"><input v-model="form.organization_kind" type="radio" value="recipient"/>领取食品的组织</label></div></fieldset><p class="form-hint">新组织注册后需运营人员审核。邮箱用于登录，本版本尚未提供邮箱验证或自助重置密码。</p></template><p v-if="error" class="error" role="alert">{{error}}</p><button class="button full" :disabled="busy">{{busy?'正在处理…':register?'创建账户':'登录工作台'}}<ArrowUpRight :size="18"/></button></form><p class="auth-switch">{{register?'已经加入了？':'第一次来？'}}<RouterLink :to="register?'/login':'/register'">{{register?'去登录':'创建组织账户'}}</RouterLink></p></div></section></template>
+<template>
+  <section class="auth-shell container">
+    <div class="auth-story">
+      <span class="eyebrow">{{ t("authWelcome") }}</span>
+      <h1>{{ t("authTitle") }}</h1>
+      <p>{{ t("authCopy") }}</p>
+      <Leaf class="auth-leaf" :size="180" :stroke-width="0.7" />
+      <div class="auth-security">
+        <ShieldCheck :size="20" />{{ t("authSecurity") }}
+      </div>
+    </div>
+    <div class="auth-panel">
+      <h2>{{ register ? t("authJoin") : t("authHello") }}</h2>
+      <p>{{ register ? t("authJoinCopy") : t("authLoginCopy") }}</p>
+      <form @submit.prevent="submit">
+        <label v-if="register"
+          >{{ t("yourName")
+          }}<input
+            v-model="form.name"
+            autocomplete="name"
+            maxlength="100"
+            required
+            :placeholder="t('namePlaceholder')" /></label
+        ><label
+          >{{ t("email")
+          }}<input
+            v-model="form.email"
+            type="email"
+            autocomplete="email"
+            maxlength="254"
+            required
+            placeholder="you@organisation.org" /></label
+        ><label
+          >{{ t("password")
+          }}<input
+            v-model="form.password"
+            type="password"
+            :autocomplete="register ? 'new-password' : 'current-password'"
+            :minlength="register ? 12 : 1"
+            maxlength="128"
+            required
+            :placeholder="
+              register ? t('common.passwordMin') : t('common.passwordInput')
+            " /></label
+        ><template v-if="register"
+          ><label
+            >{{ t("orgName")
+            }}<input
+              v-model="form.organization_name"
+              minlength="2"
+              maxlength="160"
+              required
+              :placeholder="t('orgName')"
+          /></label>
+          <fieldset>
+            <legend>{{ t("participate") }}</legend>
+            <div class="role-options">
+              <label :class="{ active: form.organization_kind === 'donor' }"
+                ><input
+                  v-model="form.organization_kind"
+                  type="radio"
+                  value="donor"
+                />{{ t("donorRole") }}</label
+              ><label
+                :class="{ active: form.organization_kind === 'recipient' }"
+                ><input
+                  v-model="form.organization_kind"
+                  type="radio"
+                  value="recipient"
+                />{{ t("recipientRole") }}</label
+              >
+            </div>
+          </fieldset>
+          <p class="form-hint">{{ t("reviewNote") }}</p></template
+        >
+        <p v-if="error" class="error" role="alert">{{ errorMessage(error) }}</p>
+        <button class="button full" :disabled="busy">
+          {{
+            busy
+              ? t("working")
+              : register
+                ? t("createAccount")
+                : t("loginWorkspace")
+          }}<ArrowUpRight :size="18" />
+        </button>
+      </form>
+      <p class="auth-switch">
+        {{ register ? t("alreadyJoined") : t("firstTime")
+        }}<RouterLink :to="register ? '/login' : '/register'">{{
+          register ? t("goLogin") : t("createOrg")
+        }}</RouterLink>
+      </p>
+    </div>
+  </section>
+</template>
