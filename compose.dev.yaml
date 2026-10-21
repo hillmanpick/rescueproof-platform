@@ -1,0 +1,21 @@
+name: rescueproof-dev
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: rescueproof
+      POSTGRES_PASSWORD: rescueproof-dev-only
+      POSTGRES_DB: rescueproof
+    ports: ["127.0.0.1:54329:5432"]
+    volumes: ["postgres_dev:/var/lib/postgresql"]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U rescueproof -d rescueproof"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    ports: ["127.0.0.1:63799:6379"]
+    command: [redis-server, --save, ""]
+volumes:
+  postgres_dev:

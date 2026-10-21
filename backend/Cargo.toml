@@ -1,0 +1,32 @@
+[package]
+name = "rescueproof"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+
+[dependencies]
+axum = { version = "0.8", features = ["macros"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json", "migrate"] }
+redis = { version = "0.32", features = ["tokio-comp", "connection-manager"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+argon2 = "0.5"
+sha2 = "0.10"
+sha3 = "0.10"
+hex = "0.4"
+rand = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tower-http = { version = "0.6", features = ["trace", "request-id", "timeout", "limit"] }
+dotenvy = "0.15"
+anyhow = "1"
+thiserror = "2"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+url = "2"
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
