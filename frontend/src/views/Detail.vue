@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { t, number } from "../i18n";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onBeforeUnmount, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import QRCode from "qrcode";
 import {
@@ -65,6 +65,36 @@ const eventLabels = computed<Record<string, string>>(() => ({
   "dispute.opened": t("event.disputed"),
   "dispute.resolved": t("event.resolved"),
 }));
+let proofRefresh: ReturnType<typeof setTimeout> | undefined;
+let disposed = false;
+function scheduleProofRefresh() {
+  clearTimeout(proofRefresh);
+  const complete =
+    proof.value.length > 0 &&
+    proof.value.length >= events.value.length &&
+    proof.value.every((p) => p.status === "confirmed");
+  if (disposed || !journey.value || complete) return;
+  const id = String(route.params.id);
+  proofRefresh = setTimeout(async () => {
+    try {
+      if (document.visibilityState !== "hidden") {
+        const result = await api<{ items: typeof proof.value }>(
+          `/batches/${id}/proof`,
+        );
+        if (!disposed && id === String(route.params.id))
+          proof.value = result.items;
+      }
+    } catch {
+      // A transient polling failure must not erase evidence already displayed.
+    } finally {
+      if (!disposed && id === String(route.params.id)) scheduleProofRefresh();
+    }
+  }, 5000);
+}
+onBeforeUnmount(() => {
+  disposed = true;
+  clearTimeout(proofRefresh);
+});
 async function load() {
   if (loading.value) return;
   loading.value = true;
@@ -92,6 +122,7 @@ async function load() {
     error.value = e;
   } finally {
     loading.value = false;
+    scheduleProofRefresh();
   }
 }
 onMounted(load);
@@ -255,8 +286,10 @@ function transactionUrl(proof: Record<string, unknown>) {
           </div>
           <div v-if="journey" class="surface proof-panel">
             <h3><ShieldCheck :size="20" />{{ t("detail.proof") }}</h3>
-            <p v-if="!proof.length">{{ t("detail.pendingProof") }}</p>
-            <template v-else
+            <p v-if="!proof.length || proof.length < events.length">
+              {{ t("detail.pendingProof") }}
+            </p>
+            <template v-if="proof.length"
               ><div
                 v-for="p in proof"
                 :key="String(p.event_id)"
