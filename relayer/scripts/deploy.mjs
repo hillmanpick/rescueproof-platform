@@ -18,7 +18,7 @@ const artifact = output.contracts["RescueProofAnchor.sol"].RescueProofAnchor;
 const provider = new JsonRpcProvider(rpc);
 const signer = new Wallet(key, provider);
 const network = await provider.getNetwork();
-if (network.chainId !== 84532n) throw new Error(`Refusing deployment to chain ${network.chainId}; this script is for Base Sepolia (84532)`);
+if (network.chainId !== 11155111n) throw new Error(`Refusing deployment to chain ${network.chainId}; this script is for Ethereum Sepolia (11155111)`);
 const factory = new ContractFactory(artifact.abi, `0x${artifact.evm.bytecode.object}`, signer);
 const deployed = await factory.deploy(signer.address);
 await deployed.waitForDeployment();

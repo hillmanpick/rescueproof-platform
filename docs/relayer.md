@@ -13,7 +13,7 @@ Content-Type: application/json
 {
   "anchor_id":"00000000-0000-4000-8000-000000000001",
   "root":"0x<32-byte-keccak-root>",
-  "chain_id":84532,
+  "chain_id":11155111,
   "contract_address":"0x<deployed-RescueProofAnchor-address>"
 }
 ```
@@ -22,17 +22,19 @@ Success must return `{"transaction_hash":"0x<32-byte transaction hash>"}` and mu
 
 The repository includes the isolated Node.js Relayer in `relayer/`. It accepts only authenticated, bounded requests with matching idempotency IDs; checks the configured chain, deployed contract code and owner at startup; serializes writes to a contract; waits for a mined transaction; and stores idempotency results in a persistent file. Its signing key is not passed to the API container. In Compose, enable it with `docker compose --profile anchor up -d --build relayer`; the API reaches it at `http://relayer:8080` over the non-published Docker network. HTTP is allowed only for this fixed private service hostname. Keep the signer funded only with a small testnet balance.
 
-For the Base Sepolia demo, set `ANCHOR_CHAIN_ID=84532`, `ANCHOR_RPC_URL`, `ANCHOR_RELAYER_URL=http://relayer:8080`, a random `ANCHOR_RELAYER_TOKEN`, and a freshly deployed `ANCHOR_CONTRACT_ADDRESS`. Put the dedicated key in `RELAYER_PRIVATE_KEY`; do not use a personal wallet key or commit `.env`. Deploy from a secure local terminal after funding a dedicated wallet with Base Sepolia test ETH:
+For the Ethereum Sepolia demo, set `ANCHOR_CHAIN_ID=11155111`, `ANCHOR_RPC_URL`, `ANCHOR_RELAYER_URL=http://relayer:8080`, a random `ANCHOR_RELAYER_TOKEN`, and a freshly deployed `ANCHOR_CONTRACT_ADDRESS`. Put the dedicated key in `RELAYER_PRIVATE_KEY`; do not use a personal wallet key or commit `.env`. Deploy from a secure local terminal after funding a dedicated wallet with Ethereum Sepolia test ETH. The deployment script rejects all other chains, including Ethereum Mainnet and Base Sepolia:
 
 ```powershell
 cd relayer
 npm ci
-$env:ANCHOR_RPC_URL = 'https://your-base-sepolia-rpc'
+$env:ANCHOR_RPC_URL = 'https://your-ethereum-sepolia-rpc'
 $env:RELAYER_PRIVATE_KEY = '0x<dedicated-testnet-key>'
 npm run deploy
 ```
 
-Copy the reported contract address and the same RPC, chain ID, relayer URL, private key and shared token into the untracked root `.env`. Start the app with `docker compose --profile anchor up -d --build`; verify `docker compose ps` and worker logs. The public proof response includes the receipt status, contract, chain, block and transaction hash. The Detail page links confirmed Base Sepolia and Ethereum Sepolia transactions to their explorers. Do not use a mainnet key or mainnet RPC for this demo.
+Copy the reported contract address and the same RPC, chain ID, relayer URL, private key and shared token into the untracked root `.env`. Start the app with `docker compose --profile anchor up -d --build`; verify `docker compose ps` and worker logs. The proof response includes the anchor status, contract, chain, block and transaction hash. Ethereum Sepolia transactions link to `https://sepolia.etherscan.io/tx/<transaction_hash>`. Base Sepolia explorer links remain supported for any older records. Do not reuse a Base Sepolia contract address or expect its test ETH balance to carry over.
+
+Get Ethereum Sepolia test ETH from the [Google Cloud faucet](https://cloud.google.com/application/web3/faucet/ethereum/sepolia) or [Alchemy faucet](https://www.alchemy.com/faucets/ethereum-sepolia); availability, eligibility and quotas depend on the provider. See [Ethereum network documentation](https://ethereum.org/en/developers/docs/networks/) for other faucets. Only share the public wallet address with a faucet. Never use the publicly known key in the local integration test on a public network.
 
 Run the local-chain end-to-end test with `cd relayer; npm ci; npm test`. It compiles and deploys the Solidity contract on an ephemeral Ganache EVM, submits a signed transaction through the HTTP Relayer, repeats the same idempotency key, and independently checks the receipt and stored root over JSON-RPC. This proves the software path, not a public-network transaction.
 
