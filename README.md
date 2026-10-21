@@ -65,7 +65,7 @@ The ignored integration test requires a fresh, dedicated database with `test` in
 
 ## Production deployment
 
-Use a domain before deploying. Copy `.env.example` to an untracked `.env`, create unique random database and relayer credentials, set `PUBLIC_ORIGIN=https://your-domain`, and leave `COOKIE_SECURE=true`. Verify the firewall permits inbound 80/443 only. PostgreSQL and Redis live on an internal container network and have no host port published. For a single IP with no domain, serve HTTPS through a managed proxy or an IP-capable TLS certificate; do not turn off secure cookies to expose plain HTTP.
+For a domain deployment, copy `.env.example` to an untracked `.env`, create unique random database and relayer credentials, set `PUBLIC_ORIGIN=https://your-domain`, and leave `COOKIE_SECURE=true`. Permit the selected public web ports through the firewall. PostgreSQL and Redis live on an internal container network and have no host port published. For a public IP without a domain, use the [IP HTTPS deployment guide](docs/deployment-ip.md), including the small-server Compose override and automatic IP certificate renewal. Keep secure cookies enabled.
 
 ```powershell
 docker compose up -d --build

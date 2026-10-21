@@ -1,0 +1,41 @@
+{
+    auto_https disable_redirects
+    default_sni {$SITE_ADDRESS}
+    servers {
+        protocols h1 h2
+    }
+}
+
+https://{$SITE_ADDRESS} {
+    tls {
+        issuer acme {
+            dir https://acme-v02.api.letsencrypt.org/directory
+            profile shortlived
+            disable_tlsalpn_challenge
+        }
+    }
+    encode zstd gzip
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        -Server
+    }
+    @api path /api/* /health/*
+    handle @api {
+        reverse_proxy api:3000 {
+            header_up X-Forwarded-For {remote_host}
+        }
+    }
+    handle {
+        root * /srv
+        try_files {path} /index.html
+        file_server
+    }
+}
+
+http://{$SITE_ADDRESS} {
+    redir {$PUBLIC_ORIGIN}{uri} permanent
+}

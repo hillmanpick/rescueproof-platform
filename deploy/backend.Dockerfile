@@ -1,5 +1,7 @@
 FROM rust:1.96-bookworm AS builder
 WORKDIR /app
+ARG CARGO_BUILD_JOBS=2
+ENV CARGO_BUILD_JOBS=${CARGO_BUILD_JOBS}
 COPY Cargo.toml Cargo.lock ./
 COPY backend ./backend
 RUN cargo build --locked --release --bin rescueproof

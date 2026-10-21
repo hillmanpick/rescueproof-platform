@@ -11,4 +11,6 @@ test-results/
 *.tsbuildinfo
 *.pem
 *.key
+*.dump
+relayer-state.json
 .DS_Store

@@ -141,7 +141,12 @@ async fn relay(s: &AppState) -> anyhow::Result<()> {
     };
     let url = url::Url::parse(base)?;
     anyhow::ensure!(
-        url.scheme() == "https" || url.host_str() == Some("127.0.0.1"),
+        url.scheme() == "https"
+            || url.scheme() == "http"
+                && matches!(
+                    url.host_str(),
+                    Some("localhost" | "127.0.0.1" | "::1" | "relayer")
+                ),
         "Relayer must use HTTPS"
     );
     let mut tx = s.db.begin().await?;

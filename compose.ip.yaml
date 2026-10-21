@@ -1,0 +1,25 @@
+services:
+  web:
+    build:
+      dockerfile: deploy/web-runtime.Dockerfile
+    volumes:
+      - ./deploy/Caddyfile.ip:/etc/caddy/Caddyfile:ro
+    mem_limit: 96m
+    cpus: 0.3
+  api:
+    mem_limit: 192m
+    cpus: 0.5
+  worker:
+    mem_limit: 128m
+    cpus: 0.3
+  relayer:
+    mem_limit: 160m
+    cpus: 0.3
+  postgres:
+    command: [postgres, -c, shared_buffers=64MB, -c, max_connections=50]
+    mem_limit: 256m
+    cpus: 0.5
+  redis:
+    command: [redis-server, --maxmemory, 64mb, --maxmemory-policy, allkeys-lru, --save, ""]
+    mem_limit: 96m
+    cpus: 0.2
