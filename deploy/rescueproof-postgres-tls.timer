@@ -1,0 +1,10 @@
+[Unit]
+Description=Keep RescueProof PostgreSQL TLS certificate current
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+Unit=rescueproof-postgres-tls.service
+
+[Install]
+WantedBy=timers.target

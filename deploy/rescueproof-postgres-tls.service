@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync renewed Caddy IP certificate to RescueProof PostgreSQL
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/home/rescueproof
+UMask=0077
+ExecStart=/bin/sh /home/rescueproof/scripts/sync-postgres-tls.sh

@@ -8,6 +8,10 @@ The API applies SQL migrations on startup. The Worker uses PostgreSQL `SKIP LOCK
 
 ## Health and logs
 
+For the deployed public database overlay, use Compose's `COMPOSE_FILE` setting
+from `.env` (all three deployment files). See [public database access](database-public.md)
+for mandatory TLS on port 5678 and its certificate synchronization timer.
+
 `GET /health/live` checks process liveness. `GET /health/ready` checks PostgreSQL and Redis. Useful commands:
 
 ```powershell

@@ -6,6 +6,13 @@ The deployed demonstration lives in `/home/rescueproof` and is reachable at
 
 ## Entry point and certificates
 
+Update on 2026-10-22: desktop PostgreSQL access was explicitly enabled on TCP
+5678 with mandatory TLS. The deployed `.env` now selects
+`compose.yaml:compose.ip.yaml:compose.database-public.yaml`; use `sudo docker compose`
+without `-f`, or include all three files in explicit commands below. The
+internal-only description below records the initial topology. See
+[public database access](database-public.md) for client settings and certificate renewal.
+
 Use `compose.yaml` together with `compose.ip.yaml`. Caddy serves the prebuilt Vue
 bundle and proxies same-origin API requests to Rust. Only host TCP 80 and 10880
 are published. The host's existing services on 443 and 8443 are preserved.
