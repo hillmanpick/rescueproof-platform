@@ -5,6 +5,6 @@ RUN npm ci --registry=https://registry.npmjs.org
 COPY frontend/ ./
 RUN npm run build
 
-FROM caddy:2-alpine
-COPY --from=builder /app/dist /srv
-COPY deploy/Caddyfile /etc/caddy/Caddyfile
+FROM nginx:stable-alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY deploy/nginx.conf.template /etc/nginx/templates/default.conf.template

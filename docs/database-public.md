@@ -30,13 +30,14 @@ both the data and edge networks because Docker does not publish a service on
 an exclusively internal network.
 
 Run `sudo env POSTGRES_TLS_BOOTSTRAP=true sh scripts/sync-postgres-tls.sh` before
-first enabling this overlay. The script copies Caddy's trusted IP certificate
+first enabling this overlay. The script copies the internal certificate manager's IP certificate
 and key to protected `work/postgres-tls`, checks expiry and matching public keys,
 then gives the files to UID/GID 70 used by `postgres:18-alpine`. Only PostgreSQL
 receives this directory; unrelated services are unchanged. The
 `rescueproof-postgres-tls.timer` runs certificate synchronization every 15 minutes;
-changed files trigger a PostgreSQL configuration reload. Keep Caddy's port 80
-open for automatic certificate renewal. If changing the PostgreSQL base image,
+changed files trigger a PostgreSQL configuration reload. It also validates and
+gracefully reloads Nginx to load renewed certificates. Keep public port 80 open;
+Nginx forwards HTTP-01 challenges to the internal certificate manager. If changing the PostgreSQL base image,
 verify its user ID before reusing this synchronization script.
 
 The original internal-only topology remains available by omitting the public

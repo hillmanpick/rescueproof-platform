@@ -3,7 +3,7 @@ services:
     build:
       dockerfile: deploy/web-runtime.Dockerfile
     volumes:
-      - ./deploy/Caddyfile.ip:/etc/caddy/Caddyfile:ro
+      - ./deploy/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
     mem_limit: 96m
     cpus: 0.3
   api:

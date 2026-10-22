@@ -3,4 +3,4 @@
 !frontend/dist/
 !frontend/dist/**
 !deploy/
-!deploy/Caddyfile
+!deploy/nginx.conf.template

@@ -1,0 +1,82 @@
+log_format rescueproof '$remote_addr [$time_local] $request_method $uri $server_protocol '
+                      'status=$status bytes=$body_bytes_sent request_id=$request_id '
+                      'request_time=$request_time upstream_status=$upstream_status '
+                      'upstream_time=$upstream_response_time';
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name ${SITE_ADDRESS};
+    server_tokens off;
+    access_log /dev/stdout rescueproof;
+    error_log /dev/stderr warn;
+    resolver 127.0.0.11 valid=10s ipv6=off;
+
+    location = /nginx-health {
+        access_log off;
+        return 200 'ok';
+    }
+    location ^~ /.well-known/acme-challenge/ {
+        set $cert_service http://cert-manager:80;
+        proxy_pass $cert_service;
+        proxy_set_header Host $host;
+    }
+    location / {
+        return 308 ${PUBLIC_ORIGIN}$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    http2 on;
+    server_name ${SITE_ADDRESS};
+    server_tokens off;
+    ssl_certificate /certificates/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${SITE_ADDRESS}/${SITE_ADDRESS}.crt;
+    ssl_certificate_key /certificates/caddy/certificates/acme-v02.api.letsencrypt.org-directory/${SITE_ADDRESS}/${SITE_ADDRESS}.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:SSL:5m;
+    ssl_session_timeout 10m;
+    root /usr/share/nginx/html;
+    index index.html;
+    client_max_body_size 2m;
+    resolver 127.0.0.11 valid=10s ipv6=off;
+
+    access_log /dev/stdout rescueproof;
+    error_log /dev/stderr warn;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+    add_header Permissions-Policy 'camera=(), microphone=(), geolocation=()' always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+    add_header X-Request-ID $request_id always;
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+
+    location ~ ^/(api|health)/ {
+        set $api_service http://api:3000;
+        proxy_pass $api_service;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Request-ID $request_id;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 60s;
+    }
+    location /assets/ {
+        try_files $uri =404;
+        expires 7d;
+    }
+    location = /index.html {
+        expires -1;
+    }
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

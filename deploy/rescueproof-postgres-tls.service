@@ -1,5 +1,5 @@
 [Unit]
-Description=Sync renewed Caddy IP certificate to RescueProof PostgreSQL
+Description=Reload RescueProof Nginx and synchronize renewed TLS certificate to PostgreSQL
 Requires=docker.service
 After=docker.service
 

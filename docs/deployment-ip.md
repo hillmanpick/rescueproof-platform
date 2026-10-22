@@ -13,17 +13,30 @@ without `-f`, or include all three files in explicit commands below. The
 internal-only description below records the initial topology. See
 [public database access](database-public.md) for client settings and certificate renewal.
 
-Use `compose.yaml` together with `compose.ip.yaml`. Caddy serves the prebuilt Vue
-bundle and proxies same-origin API requests to Rust. Only host TCP 80 and 10880
-are published. The host's existing services on 443 and 8443 are preserved.
+Use all three Compose files above. Nginx serves the prebuilt Vue bundle and
+proxies same-origin `/api/*` and `/health/*` requests to Rust. Host TCP 80 maps
+to Nginx HTTP; 10880 maps to Nginx HTTPS on container 443. Existing host services
+on 443 and 8443 are preserved. `deploy/nginx.conf.template` is the active entry
+configuration; old Caddy entry files are not mounted.
 
-`deploy/Caddyfile.ip` requests a publicly trusted Let's Encrypt IP certificate
-using the `shortlived` ACME profile and HTTP-01. **Keep TCP 80 open for automatic
-renewal.** The certificate lasts approximately six days; Caddy renews it using
-its persistent `caddy_data` volume. Do not delete that volume during upgrades.
-`default_sni` supports clients which omit SNI for IP addresses. HTTP/3 is disabled
-because this deployment maps external 10880 to container 443; HTTP/1.1 and HTTP/2
-remain enabled. HTTP on port 80 redirects to the configured public HTTPS origin.
+The internal-only `cert-manager` uses `deploy/Caddyfile.certificates` to renew
+the trusted IP certificate using ACME `shortlived` and HTTP-01. It has no public
+port mapping and does not serve the application. Nginx forwards only HTTP-01
+challenge paths to it. **Keep TCP 80 open for renewal.** Existing `caddy_data`
+and `caddy_config` volumes are retained; never delete certificate storage. The
+certificate lasts approximately six days. Nginx mounts certificates read-only.
+
+The existing `rescueproof-postgres-tls.timer` validates certificate/key pairs,
+reloads Nginx gracefully and updates PostgreSQL TLS every 15 minutes. Run
+`sudo systemctl start rescueproof-postgres-tls.service` after manual renewal.
+Nginx enables HTTP/1.1 and HTTP/2, a default TLS virtual host for IP/no-SNI
+clients, asset caching, gzip and SPA fallback. Port 80 redirects to HTTPS.
+Access logs include request IDs and upstream status, without query strings.
+
+On a fresh server, obtain a certificate before starting Nginx. Start
+`cert-manager`, temporarily route public port 80 to its port 80 for HTTP-01,
+and wait for the certificate files before transferring that listener to Nginx.
+This migration reused existing valid certificate storage.
 
 Required non-secret settings in the protected server `.env`:
 
@@ -37,7 +50,7 @@ ANCHOR_CHAIN_ID=11155111
 ANCHOR_CONTRACT_ADDRESS=0xf79c830b25d18eeE339d91551b1e3f2668d583AB
 ANCHOR_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 ANCHOR_RELAYER_URL=http://relayer:8080
-WEB_IMAGE=rescueproof-web:20261021-ip10880
+WEB_IMAGE=rescueproof-web:20261022-nginx
 API_IMAGE=rescueproof-api:20261021-ip10880
 RELAYER_IMAGE=rescueproof-relayer:20261021-ip10880
 ```
@@ -57,18 +70,19 @@ excluding other local files. On the server:
 
 ```sh
 cd /home/rescueproof
-sudo docker compose -f compose.yaml -f compose.ip.yaml --profile anchor config --quiet
-sudo docker compose -f compose.yaml -f compose.ip.yaml build --build-arg CARGO_BUILD_JOBS=1 api web relayer
-sudo docker compose -f compose.yaml -f compose.ip.yaml --profile anchor up -d --no-build
-sudo docker compose -f compose.yaml -f compose.ip.yaml --profile anchor ps
-sudo docker compose -f compose.yaml -f compose.ip.yaml logs --tail 100 api worker relayer
+sudo docker compose --profile anchor config --quiet
+sudo docker compose build --build-arg CARGO_BUILD_JOBS=1 api web relayer
+sudo docker compose --profile anchor up -d --no-build
+sudo docker compose exec -T web nginx -t
+sudo docker compose --profile anchor ps
+sudo docker compose logs --tail 100 web api worker relayer
 curl --fail https://124.156.199.59:10880/health/ready
 ```
 
 For a shared 2GB machine, constrain a dedicated BuildKit builder rather than
 letting Rust compilation compete with existing services. The initial build used
 one compilation job, one CPU, a 1200MB builder memory limit and 2200MB memory plus
-swap allowance. Runtime service memory limits total 928MB; these are ceilings,
+swap allowance. Runtime service memory limits total 1024MB; these are ceilings,
 not reserved allocations. PostgreSQL uses 64MB shared buffers and 50 connections;
 Redis caps its cache at 64MB. No database or Relayer port is published.
 

@@ -1,3 +1,3 @@
-FROM caddy:2-alpine
-COPY frontend/dist /srv
-COPY deploy/Caddyfile /etc/caddy/Caddyfile
+FROM nginx:stable-alpine
+COPY frontend/dist /usr/share/nginx/html
+COPY deploy/nginx.conf.template /etc/nginx/templates/default.conf.template

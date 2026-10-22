@@ -10,7 +10,7 @@ The first release is a modular Rust/Axum API with PostgreSQL as the source of tr
 frontend/      Vue 3 + TypeScript application
 backend/       Axum API, domain rules, worker, SQL migrations
 contracts/     Minimal EVM root-anchor contract
-deploy/        Caddy and container build definitions
+deploy/        Nginx, certificate renewal and container build definitions
 docs/          API, security, operations and relayer notes
 scripts/       Backup helpers
 compose.yaml   Production-shaped single-host deployment

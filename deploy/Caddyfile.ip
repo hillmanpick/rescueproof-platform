@@ -6,14 +6,7 @@
     }
 }
 
-https://{$SITE_ADDRESS} {
-    tls {
-        issuer acme {
-            dir https://acme-v02.api.letsencrypt.org/directory
-            profile shortlived
-            disable_tlsalpn_challenge
-        }
-    }
+(common_rescueproof) {
     encode zstd gzip
     header {
         X-Content-Type-Options nosniff
@@ -34,6 +27,19 @@ https://{$SITE_ADDRESS} {
         try_files {path} /index.html
         file_server
     }
+}
+
+https://{$SITE_ADDRESS} {
+    tls {
+        # Use an RSA leaf key for the IP certificate.
+        key_type rsa2048
+        issuer acme {
+            dir https://acme-v02.api.letsencrypt.org/directory
+            profile shortlived
+            disable_tlsalpn_challenge
+        }
+    }
+    import common_rescueproof
 }
 
 http://{$SITE_ADDRESS} {
