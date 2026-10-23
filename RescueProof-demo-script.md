@@ -1,0 +1,47 @@
+# RescueProof demo narration
+
+English synthetic narration; actual UI captures plus explanatory diagrams. All food data is synthetic. New batch 7233367d is unanchored; earlier batch 129a57a0 has existing confirmed Sepolia anchors.
+
+## 01 / THE IDEA
+
+Meet RescueProof: a community food rescue platform with verifiable handoff records. It connects businesses with surplus food to approved community organizations. This walkthrough uses synthetic test data, not measured food rescue impact.
+
+## 02 / THE PROBLEM
+
+Good food can go to waste when pickup coordination is fragmented. Messages alone do not provide a consistent record of who claimed a donation or confirmed delivery. RescueProof brings those steps into one traceable workflow.
+
+## 03 / PUBLISH
+
+As a donor, we enter twelve demo bread items, an estimated weight, pickup times, storage requirements, and allergens. The full address and contact are restricted to the donor and successful claimant. We publish the test listing.
+
+## 04 / CLAIM
+
+Now we switch to a separate, approved recipient account and claim the available food. After the claim succeeds, pickup information becomes visible to that organization. Regular users do not need a crypto wallet to participate.
+
+## 05 / HANDOFF
+
+The recipient generates a time limited pickup code. The donor checks that code and confirms the handoff. The code shown here was consumed during this demonstration and cannot authorize another pickup. This is a software test, not a physical delivery.
+
+## 06 / RECEIPT
+
+The recipient checks the delivery and enters an actual received weight of two point eight kilograms for this synthetic test. They then confirm receipt. The platform separates reported actual weight from the donor's estimate instead of treating estimates as completed impact.
+
+## 07 / COMPLETED
+
+The new batch is now completed, with separate events for listing, claim, handoff, and receipt. Its records are still awaiting blockchain anchoring. A completed food workflow and a confirmed blockchain transaction are distinct states, and the interface keeps that distinction visible.
+
+## 08 / WHY WEB3
+
+Operational data stays in PostgreSQL, behind a Rust API and Vue interface, with Redis supporting rate limits. A worker groups events into a Merkle root. A relayer anchors that compact commitment on Ethereum Sepolia, reducing blockchain writes and keeping personal details off chain.
+
+## 09 / VERIFY
+
+For on chain verification, we open a different demo batch that was anchored earlier. Its four event records show confirmed anchors, transaction links, and a downloadable proof. This existing proof is shown separately from the new, unanchored batch.
+
+## 10 / PUBLIC EVIDENCE
+
+Opening the linked transaction in Etherscan independently shows a successful anchor call on Sepolia. A Merkle proof checks record integrity against the published root. It cannot prove that food physically existed, was safe, or actually reached someone.
+
+## 11 / BUILD FOR GOOD
+
+RescueProof aims to make food sharing easier and its records easier to check. The prototype supports Chinese, English, French, and Japanese. Built by a solo developer, it combines practical coordination with independently verifiable records. Explore the open source project on GitHub.
