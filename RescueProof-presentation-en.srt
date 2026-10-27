@@ -1,0 +1,101 @@
+1
+00:00:00,000 --> 00:00:35,048
+Hello, and thank you for reviewing RescueProof. RescueProof addresses a practical
+coordination problem in community food rescue. Food businesses can have safe surplus while
+nearby community organizations need food, but the handoff is often managed through
+disconnected messages and spreadsheets. Donors, recipient organizations, and coordinators
+need a clear record of what was published, claimed, handed over, and received. This
+presentation uses synthetic test data and demonstrates the working prototype.
+
+2
+00:00:35,048 --> 00:01:00,983
+RescueProof puts the workflow in one place. A donor publishes the food, quantity, pickup
+window, storage requirements, and allergen information. An approved community organization
+claims the listing. The donor validates a time limited pickup code, and both parties
+confirm the handoff. The result is an event history that is easier to follow and
+independently check.
+
+3
+00:01:00,983 --> 00:01:32,277
+The primary users are small food businesses, community organizations, and operators who
+coordinate local pickup. Businesses get a structured way to share available food.
+Community organizations see the details needed to decide whether they can collect it
+safely. Operators can review organization approval, handoff events, disputes, and
+verification evidence. The platform does not replace food safety decisions or accountable
+human coordination.
+
+4
+00:01:32,277 --> 00:01:59,006
+Here is the donor flow. We publish a synthetic test listing for twelve bread items and an
+estimated three kilograms. The form captures a pickup window, expiry time, storage
+requirements, and allergens. Private address and contact details are only revealed after a
+successful claim. The donor confirms the information before publishing, so the record has
+an accountable source.
+
+5
+00:01:59,006 --> 00:02:22,362
+We now switch to a separate approved recipient account. The organization claims the
+available listing. Only after the claim succeeds does the private pickup information
+become available. This is an important product choice: a donor or recipient can use the
+food sharing workflow without first managing a blockchain wallet or paying a transaction
+fee.
+
+6
+00:02:22,362 --> 00:02:47,307
+The recipient generates a time limited pickup code. At handoff, the donor checks that code
+and confirms that the intended organization is collecting the listing. In this
+demonstration the code was consumed by the test flow and cannot authorize another pickup.
+The QR code is a coordination control; it is not presented as proof of food safety or
+physical identity.
+
+7
+00:02:47,307 --> 00:03:14,117
+The donor confirms that the handoff occurred. The recipient then enters the actual
+received weight, two point eight kilograms in this synthetic test, and confirms receipt.
+RescueProof keeps the donor estimate separate from the recipient reported amount. This
+prevents an estimate from being presented as completed social impact. The timeline records
+each side's confirmation as a distinct event.
+
+8
+00:03:14,117 --> 00:03:49,775
+The application is a Vue 3 and TypeScript client backed by a Rust and Axum API. PostgreSQL
+is the source of truth for users, organizations, food batches, claims, handovers,
+disputes, and proof records. Redis supports rate limiting and short lived workflow
+support. Background workers process notifications and evidence batching. This separation
+keeps ordinary operations responsive and gives the backend one place to enforce
+authorization, validation, and transaction boundaries.
+
+9
+00:03:49,775 --> 00:04:20,663
+Blockchain is used for a narrow purpose: integrity verification. Completed event payloads
+are hashed and grouped into a Merkle tree. A compact Merkle root is anchored by a Solidity
+contract on Ethereum Sepolia through a relayer. The full donation record and personal
+details stay off chain. Merkle batching reduces the number of writes and lowers cost.
+Putting every field on chain would be more expensive, less private, and harder to correct
+operationally.
+
+10
+00:04:20,663 --> 00:04:44,443
+This page shows a separate demo batch that was anchored earlier. Each event has an on
+chain verified status, a transaction link, and a downloadable verification proof. The
+application can recompute the event hash and compare its Merkle path with the public root.
+This gives an external reviewer a way to check whether the stored event changed after
+anchoring.
+
+11
+00:04:44,443 --> 00:05:16,407
+The innovation is in using Web3 where it adds accountability, without making every
+participant become a blockchain operator. Routine sharing remains a familiar web
+application. The evidence layer is public and tamper evident, while operational details
+remain private. The prototype is deployable as a Vue application, Rust services,
+PostgreSQL, Redis, and an isolated relayer on a single server, leaving a practical path
+for pilots with local organizations.
+
+12
+00:05:16,407 --> 00:05:47,730
+RescueProof is a working Tech Track prototype for clearer community food rescue
+coordination. It combines a usable publish to receipt workflow with verifiable integrity
+evidence and an explicit privacy boundary. The records in this presentation are synthetic,
+Ethereum Sepolia is a testnet, and an anchor cannot prove physical delivery or food
+safety. The next step is a pilot with accountable food businesses and community
+organizations. Thank you for watching.
