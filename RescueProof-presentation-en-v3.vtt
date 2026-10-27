@@ -1,0 +1,441 @@
+WEBVTT
+
+1
+00:00:00.550 --> 00:00:04.759
+Every day food businesses have safe surplus
+while nearby community
+
+2
+00:00:04.759 --> 00:00:09.664
+groups are looking for food The hard part is not
+finding a good intention
+
+3
+00:00:09.684 --> 00:00:13.969
+It is coordinating the handoff keeping the
+details clear and showing
+
+4
+00:00:13.969 --> 00:00:18.574
+what actually happened A message can say that
+food was available A
+
+5
+00:00:18.574 --> 00:00:22.426
+spreadsheet can say that someone planned to
+collect it Neither one
+
+6
+00:00:22.426 --> 00:00:27.082
+gives everyone the same reliable timeline
+RescueProof is built for
+
+7
+00:00:27.082 --> 00:00:29.013
+that missing layer of trust
+
+8
+00:00:30.342 --> 00:00:34.718
+RescueProof is designed around three people in
+the same handoff A
+
+9
+00:00:34.718 --> 00:00:38.315
+food business needs to describe what is
+available and when it must
+
+10
+00:00:38.315 --> 00:00:42.422
+be collected An approved community organization
+needs to claim the
+
+11
+00:00:42.422 --> 00:00:47.001
+offer and receive the pickup details at the
+right moment An operator
+
+12
+00:00:47.001 --> 00:00:51.764
+needs to see whether the process was completed
+disputed or corrected
+
+13
+00:00:51.784 --> 00:00:55.968
+Each person needs the same core facts without
+exposing more private
+
+14
+00:00:55.968 --> 00:00:58.499
+information than the workflow requires
+
+15
+00:00:59.842 --> 00:01:03.995
+The product goal is practical Make the path from
+surplus to receipt
+
+16
+00:01:03.995 --> 00:01:09.056
+easy to follow The donor publishes the food
+quantity pickup window
+
+17
+00:01:09.056 --> 00:01:13.934
+storage requirements and allergen notes An
+approved organization claims
+
+18
+00:01:13.934 --> 00:01:18.444
+the listing The donor validates the handoff The
+recipient confirms
+
+19
+00:01:18.444 --> 00:01:22.390
+what was actually received This does not replace
+an in-person food
+
+20
+00:01:22.390 --> 00:01:26.556
+safety check It creates a clear operational
+record around that check
+
+21
+00:01:26.556 --> 00:01:29.774
+so a coordinator can understand the full story
+later
+
+22
+00:01:31.008 --> 00:01:36.706
+This is the complete workflow First a donor
+publishes a listing Second
+
+23
+00:01:36.706 --> 00:01:41.620
+an approved organization claims it Third both
+sides confirm the handoff
+
+24
+00:01:41.620 --> 00:01:45.799
+and the actual received amount Finally a
+reviewer can inspect the
+
+25
+00:01:45.799 --> 00:01:51.210
+record and its integrity evidence Routine users
+see a normal web application
+
+26
+00:01:51.216 --> 00:01:55.149
+They do not need to understand wallets gas or
+Merkle trees to share
+
+27
+00:01:55.149 --> 00:01:58.703
+food The technical layer appears when a reviewer
+needs independent
+
+28
+00:01:58.703 --> 00:01:59.580
+evidence
+
+29
+00:02:00.842 --> 00:02:04.591
+Here is the donor flow in the working prototype
+The donor selects
+
+30
+00:02:04.591 --> 00:02:08.953
+an organization names the food records the
+quantity and estimated
+
+31
+00:02:08.953 --> 00:02:13.390
+weight and sets the pickup window Storage
+requirements and allergen
+
+32
+00:02:13.390 --> 00:02:17.458
+information are visible parts of the form not
+hidden notes in a chat
+
+33
+00:02:17.458 --> 00:02:22.544
+message The donor can review the details before
+publishing This demonstration
+
+34
+00:02:22.544 --> 00:02:26.858
+uses synthetic test data It does not represent a
+real food offer or
+
+35
+00:02:26.858 --> 00:02:28.544
+a real contact address
+
+36
+00:02:29.800 --> 00:02:32.962
+The recipient sees available food through a
+separate organization
+
+37
+00:02:32.962 --> 00:02:36.870
+account Claiming the listing creates an explicit
+event and prevents
+
+38
+00:02:36.870 --> 00:02:40.841
+two groups from treating the same offer as
+theirs Only after the claim
+
+39
+00:02:40.841 --> 00:02:44.787
+succeeds do the private pickup details become
+available This is a
+
+40
+00:02:44.787 --> 00:02:48.512
+deliberate product choice Participants can use
+the workflow without
+
+41
+00:02:48.512 --> 00:02:52.973
+first creating a crypto wallet buying tokens or
+paying a transaction
+
+42
+00:02:52.973 --> 00:02:53.654
+fee
+
+43
+00:02:54.925 --> 00:02:59.299
+At handoff the recipient generates a time-
+limited pickup code The
+
+44
+00:02:59.299 --> 00:03:03.037
+donor checks that code before confirming the
+collection Once it is
+
+45
+00:03:03.037 --> 00:03:07.779
+used the code is consumed and cannot authorize
+another pickup This
+
+46
+00:03:07.779 --> 00:03:11.676
+reduces a common coordination mistake the wrong
+person arriving for
+
+47
+00:03:11.676 --> 00:03:16.058
+the right listing or the same listing being
+treated as open twice
+
+48
+00:03:16.064 --> 00:03:20.782
+The code is only a workflow control It is not
+proof of physical identity
+
+49
+00:03:20.782 --> 00:03:24.061
+food safety or successful delivery by itself
+
+50
+00:03:25.342 --> 00:03:29.471
+The donor confirms that the handoff happened The
+recipient then enters
+
+51
+00:03:29.471 --> 00:03:33.797
+the actual received weight and confirms receipt
+In this synthetic
+
+52
+00:03:33.797 --> 00:03:38.907
+test the recipient reports two point eight
+kilograms RescueProof keeps
+
+53
+00:03:38.907 --> 00:03:42.926
+that reported amount separate from the donor's
+original estimate That
+
+54
+00:03:42.926 --> 00:03:46.774
+distinction matters It prevents an estimate from
+being presented as
+
+55
+00:03:46.774 --> 00:03:50.953
+completed impact and it gives operators a way to
+see where a correction
+
+56
+00:03:50.953 --> 00:03:52.725
+or a dispute came from
+
+57
+00:03:54.008 --> 00:04:00.748
+The client is Vue 3 and TypeScript The API is
+Rust and Axum PostgreSQL
+
+58
+00:04:00.748 --> 00:04:06.250
+is the source of truth for users organizations
+batches claims handovers
+
+59
+00:04:06.250 --> 00:04:11.127
+disputes and proof records Redis supports rate
+limiting and short-lived
+
+60
+00:04:11.127 --> 00:04:15.723
+workflow jobs Background workers process
+notifications and evidence
+
+61
+00:04:15.723 --> 00:04:20.184
+batching This separation keeps ordinary
+operations responsive and
+
+62
+00:04:20.184 --> 00:04:24.522
+gives the backend one place to enforce
+authorization validation and
+
+63
+00:04:24.522 --> 00:04:26.183
+transaction boundaries
+
+64
+00:04:27.425 --> 00:04:32.338
+Web3 is used for one narrow purpose record
+integrity Completed event
+
+65
+00:04:32.338 --> 00:04:36.640
+payloads are hashed into a Merkle tree and a
+compact root is anchored
+
+66
+00:04:36.640 --> 00:04:41.162
+on Ethereum Sepolia through a relayer The full
+record pickup address
+
+67
+00:04:41.162 --> 00:04:45.574
+and personal details stay off chain A reviewer
+can compare the stored
+
+68
+00:04:45.574 --> 00:04:50.390
+event its Merkle path and the public contract
+root Putting every field
+
+69
+00:04:50.390 --> 00:04:54.434
+on chain would be more expensive less private
+and harder to correct
+
+70
+00:04:54.434 --> 00:04:55.495
+operationally
+
+71
+00:04:56.758 --> 00:05:00.177
+This screen shows a separate demonstration batch
+that was anchored
+
+72
+00:05:00.177 --> 00:05:05.385
+earlier Each event has an on-chain verified
+status a transaction link
+
+73
+00:05:05.385 --> 00:05:09.686
+and a downloadable verification proof The
+application can recompute
+
+74
+00:05:09.686 --> 00:05:14.061
+the event hash and compare the Merkle path with
+the public root That
+
+75
+00:05:14.061 --> 00:05:16.929
+gives an external reviewer a way to check
+whether the stored event
+
+76
+00:05:16.929 --> 00:05:21.096
+changed after anchoring The proof checks record
+integrity It does
+
+77
+00:05:21.096 --> 00:05:24.264
+not certify food quality or physical delivery
+
+78
+00:05:25.508 --> 00:05:30.037
+The impact is practical RescueProof helps small
+food businesses and
+
+79
+00:05:30.037 --> 00:05:34.502
+community organizations coordinate with less
+ambiguity A donor can
+
+80
+00:05:34.502 --> 00:05:39.285
+see what was offered A recipient can see what
+was claimed An operator
+
+81
+00:05:39.285 --> 00:05:43.417
+can see whether the handoff was confirmed or
+disputed That shared
+
+82
+00:05:43.417 --> 00:05:47.665
+history can reduce wasted surplus and make a
+local pilot easier to
+
+83
+00:05:47.665 --> 00:05:52.167
+evaluate The platform records coordination
+evidence while leaving
+
+84
+00:05:52.167 --> 00:05:56.944
+food safety and in-person judgment with the
+participating organizations
+
+85
+00:05:58.258 --> 00:06:02.289
+RescueProof turns a fragmented food rescue
+handoff into a workflow
+
+86
+00:06:02.289 --> 00:06:06.397
+that people can use and reviewers can check This
+prototype is open
+
+87
+00:06:06.397 --> 00:06:11.435
+source testnet-only and based on synthetic data
+The next step is a
+
+88
+00:06:11.435 --> 00:06:15.676
+pilot with accountable food businesses and
+community organizations
+
+89
+00:06:15.696 --> 00:06:19.726
+We are using Web3 where it adds public
+accountability while keeping
+
+90
+00:06:19.726 --> 00:06:24.872
+routine actions familiar and private Thank you
+for reviewing RescueProof
